@@ -1,0 +1,30 @@
+{
+  "name": "mongoscraper",
+  "version": "1.0.0",
+  "description": "scrapes news and lets you leave comments",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "cheerio": "^1.0.0-rc.1",
+    "express": "^4.15.3",
+    "express-handlebars": "^3.0.0",
+    "mongojs": "^2.4.0",
+    "mongoose": "^4.10.4",
+    "request": "^2.81.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CrystalFaith/mongoScraper.git"
+  },
+  "author": "Crystal F Lambert",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CrystalFaith/mongoScraper/issues"
+  },
+  "homepage": "https://github.com/CrystalFaith/mongoScraper#readme"
+}
