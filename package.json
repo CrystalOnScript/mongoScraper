@@ -10,6 +10,7 @@
     "express-handlebars": "^3.0.0",
     "mongojs": "^2.4.0",
     "mongoose": "^4.10.4",
+    "path": "^0.12.7",
     "request": "^2.81.0"
   },
   "devDependencies": {},
