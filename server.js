@@ -5,8 +5,9 @@ var mongoose    = require("mongoose");
 var bodyParser  = require("body-parser");
 var logger      = require("morgan");
 
-var Tweets      = require("./models/Tweets.js");
+
 var About       = require("./models/About.js");
+var Tweets      = require("./models/Tweets.js");
 
 var request     = require("request");
 var cheerio     = require("cheerio");
@@ -32,7 +33,7 @@ mongoose.connect("mongodb://localhost/trumpTweets");
 var db = mongoose.connection;
 
 // DROPS DATABASE
-// db.dropDatabase();
+db.dropDatabase();
 
 app.get("/", function(req, res) {
 
@@ -46,23 +47,6 @@ app.get("/", function(req, res) {
   });
 });
 
-app.get("/tweets", function(req, res) {
-
-  db.dropDatabase()
-  Tweets.find({tweetAuthor: "Donald J. Trump"}).then(function(data) {
-
-    Tweets.find({}, function(error, doc) {
-      // Log any errors
-      if (error) {
-        console.log(error);
-      }
-      // Or send the doc to the browser as a json object
-      else {
-        res.json(doc);
-      }
-    });
-});
-})
 
 app.get("/scrape", function(req, res) {
 
@@ -101,15 +85,15 @@ app.get("/scrape", function(req, res) {
       });
 
     });
-  });
 
-  Tweets.find({tweetAuthor: "Donald J. Trump"}).then(function(data) {
+    Tweets.find({tweetAuthor: "Donald J. Trump"}).then(function(data) {
 
-    var hbsObject = {
-      Tweets: data
-    };
-    console.log("this is the hbs object" + hbsObject);
-    res.render("index", hbsObject);
+      var hbsObject = {
+        Tweets: data
+      };
+      console.log("this is the hbs object" + hbsObject);
+      res.render("index", hbsObject);
+    });
   });
 });
 
