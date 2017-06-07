@@ -1,5 +1,18 @@
 console.log("jQuery is here")
 
+$("#scrape").on("click", function() {
+
+  $.ajax({
+    method: "GET",
+    url: "/scrape"
+  })
+
+    .done(function(data) {
+
+      location.reload();
+    });
+});
+
 $(".saveTweet").on("click", function() {
 
   // Save the id from the p tag
@@ -15,20 +28,23 @@ $(".saveTweet").on("click", function() {
     });
 });
 
-// $(".makeNote").on("click", function() {
-//
-//   // Save the id from the p tag
-//   var thisId = $(this).attr("data-id");
-//   // Now make an ajax call for the Article
-//   $.ajax({
-//     method: "POST",
-//     url: "/makeNote/" + thisId
-//   })
-//     // With that done, add the note information to the page
-//     .done(function(data) {
-//       console.log(data);
-//     });
-// });
+$(".removetweet").on("click", function() {
+
+  // Save the id from the p tag
+  var thisId = $(this).attr("data-id");
+  // Now make an ajax call for the Article
+  $.ajax({
+    method: "POST",
+    url: "/removetweet/" + thisId
+  })
+  location.reload()
+    // With that done, add the note information to the page
+    .done(function(data, err) {
+
+      console.log(data)
+
+    });
+});
 
 $(".makeNote").on("click", function() {
 
@@ -79,7 +95,6 @@ $(".seeNote").on("click", function() {
         $("#notes").append("<h1>"+ notes[i].title+"</h1><br><h3>"+notes[i].body+"</h3>");
 
         $("#notes").append("<button data-id='" + notes[i]._id + "' class='removeNote'>Remove</button");
-        console.log("data id of notes"+ notes[i]._id)
 
       }
     });
@@ -87,7 +102,7 @@ $(".seeNote").on("click", function() {
 
 // When you click the savenote button
 $(document).on("click", ".savenote", function() {
-  console.log("clicked me")
+
   // Save the id from the p tag
   var thisId = $(this).attr("data-id");
 
@@ -104,14 +119,24 @@ $(document).on("click", ".savenote", function() {
   })
     // With that done
     .done(function(data) {
-      // Log the response
-      console.log(data);
       // Empty the notes section
       $("#notes").empty();
     });
+});
 
-  // Also, remove the values entered in the input and textarea for note entry
-  $("#titleinput").val("");
-  $("#bodyinput").val("");
+$(document).on("click", ".removeNote", function() {
+  console.log("clicked me")
+  // Save the id from the p tag
+  var thisId = $(this).attr("data-id");
 
+  // Run a POST request to change the note, using what's entered in the inputs
+  $.ajax({
+    method: "POST",
+    url: "/removenote/" + thisId,
+  })
+    // With that done
+    .done(function(data) {
+      // reload page to show removal
+      location.reload();
+    });
 });

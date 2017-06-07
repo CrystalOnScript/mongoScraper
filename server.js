@@ -49,7 +49,7 @@ app.get("/", function(req, res) {
 
 
 app.get("/scrape", function(req, res) {
-
+  db.dropDatabase();
   request("https://twitter.com/realDonaldTrump", function(error, response, html) {
 
     var $ = cheerio.load(html);
@@ -91,8 +91,7 @@ app.get("/scrape", function(req, res) {
       var hbsObject = {
         Tweets: data
       };
-      console.log("this is the hbs object" + hbsObject);
-      res.render("index", hbsObject);
+      res.json(data);
     });
   });
 });
@@ -117,6 +116,28 @@ app.post("/savetweet/:id", function(req, res, data) {
       });
 
   console.log("saved tweet")
+
+});
+
+app.post("/removetweet/:id", function(req, res, data) {
+
+  var query = {"_id": req.params.id};
+  var update = {"saved": false};
+  var options = {new: true};
+      // Use the article id to find and update it's saved status
+      Tweets.findOneAndUpdate(query, update, options).then(function(err, doc) {
+        // Log any errors
+        if (err) {
+          console.log(err);
+        }
+        else {
+          // Or send the document to the browser
+          res.json({ success: true});
+
+        }
+      });
+
+  console.log("removed tweet")
 
 });
 
@@ -199,6 +220,20 @@ app.get("/seenote/:id", function(req, res) {
       res.json(data);
     }
   });
+});
+
+app.post("/removenote/:id", function(req, res) {
+
+  About.remove({ _id: req.params.id }, function(err) {
+    if (err) {
+      console.log(err);
+    }
+    // Otherwise, send the doc to the browser as a json object
+    else {
+      res.send("deleted");
+    }
+  });
+
 });
 
 // listens to port
