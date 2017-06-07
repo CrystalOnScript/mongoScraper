@@ -1,0 +1,17 @@
+{{#each Tweets}}
+  {{#if this.saved}}
+  <div>
+
+          <p>{{this.tweetAuthor}}</p>
+          <p>{{this.tweetTime}}</p>
+          <p>{{this.tweetText}}</p>
+
+
+            <button class="btn btn-primary makeNote" data-id="{{this.id}}">Create Theory</button>
+            <button class="btn btn-primary seeNote" data-id="{{this.id}}">See Theories</button>
+
+  </div>
+  <br>
+  {{/if}}
+{{/each}}
+<div id="notes"></div>

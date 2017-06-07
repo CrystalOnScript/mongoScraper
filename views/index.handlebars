@@ -1,0 +1,50 @@
+
+
+
+<form action="/scrape" method="GET">
+  <button class="btn btn-primary" type="submit">Get Tweets</button>
+</form>
+
+<form action="/viewTweets" method="GET">
+  <button class="btn btn-primary" type="submit">View Tweets</button>
+</form>
+
+<div id="notes">
+</div>
+
+
+  {{#each Tweets}}
+    {{#unless this.saved}}
+    <div>
+
+            <p>{{this.tweetAuthor}}</p>
+            <p>{{this.tweetTime}}</p>
+            <p>{{this.tweetText}}</p>
+
+
+              <button class="btn btn-primary saveTweet" data-id="{{this.id}}">What Is This?</button>
+
+
+    </div>
+    <br>
+    {{/unless}}
+  {{/each}}
+
+
+
+  <!-- {{#each KeepTweet}}
+    {{#if this.saved}}
+    <div>
+            <p>{{this.tweetAuthor}}</p>
+            <p>{{this.tweetTime}}</p>
+            <p>{{this.tweetText}}</p>
+
+            <form action="/saveTweet/{{this.id}}" method="POST">
+              <input type="hidden" name="tweetId" value={{this.id}}>
+              <button class="btn btn-primary" type="submit">What Is This?</button>
+            </form>
+
+    </div>
+    <br>
+    {{/if}}
+  {{/each}} -->
