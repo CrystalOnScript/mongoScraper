@@ -33,7 +33,7 @@ mongoose.connect("mongodb://localhost/trumpTweets");
 var db = mongoose.connection;
 
 // DROPS DATABASE
-db.dropDatabase();
+// db.dropDatabase();
 
 app.get("/", function(req, res) {
 
@@ -97,7 +97,9 @@ app.get("/scrape", function(req, res) {
   });
 });
 
-app.post("/savetweet/:id", function(req, res) {
+app.post("/savetweet/:id", function(req, res, data) {
+
+  console.log(data)
   var query = {"_id": req.params.id};
   var update = {"saved": true};
   var options = {new: true};
@@ -131,14 +133,33 @@ app.get("/viewTweets", function(req, res) {
     });
 });
 
-app.post("/makeNote/:id", function(req, res) {
+app.get("/makeNote/:id", function(req, res) {
 
-  console.log("this is req \n\n"+ req.body);
-  // Create a new note and pass the req.body to the entry
-  var newAbout = new About(req.body);
+  console.log("this is req id \n\n"+ req.params.id);
+      // Use the article id to find and update it's note
+      Tweets.findOne({ "_id": req.params.id })
+      // ..and populate all of the notes associated with it
+      .populate("note")
+      // now, execute our query
+      .exec(function(error, doc) {
+        // Log any errors
+        if (error) {
+          console.log(error);
+        }
+        // Otherwise, send the doc to the browser as a json object
+        else {
+          res.json(doc);
+        }
+      });
+      console.log("created note")
+});
 
+app.post("/savenote/:id", function(req, res) {
+
+  var newNote = new About(req.body);
+  console.log("this is newNote", newNote)
   // And save the new note the db
-  newAbout.save(function(error, doc) {
+  newNote.save(function(error, doc) {
     // Log any errors
     if (error) {
       console.log(error);
@@ -146,7 +167,7 @@ app.post("/makeNote/:id", function(req, res) {
     // Otherwise
     else {
       // Use the article id to find and update it's note
-      Tweets.findOneAndUpdate({ "_id": req.params.id }, { "about": doc._id })
+      Tweets.findOneAndUpdate({ "_id": req.params.id }, {$push: {"about": newNote }})
       // Execute the above query
       .exec(function(err, doc) {
         // Log any errors
@@ -160,35 +181,9 @@ app.post("/makeNote/:id", function(req, res) {
       });
     }
   });
-  console.log("created note")
 });
 
-app.post("/saveNote/:id", function(req, res) {
-
-  console.log("req.body", req.body)
-  var newAbout = new About(req.body);
-
-  var tweetId = req.params.id;
-  // And save the new note the db
-  newAbout.save(function(error, doc) {
-    // Log any errors
-    if (error) {
-      console.log(error);
-    }
-    // Otherwise
-    else {
-
-      console.log('this is the di', tweetId)
-      Tweets.findOne({ "_id": tweetId}).then(function(tweet, err){
-        console.log(tweet)
-        tweet.about.push(newAbout);
-        res.send(newAbout)
-      });
-    }
-  });
-});
-
-app.get("/seeNote/:id", function(req, res) {
+app.get("/seenote/:id", function(req, res) {
 
   // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
   Tweets.findOne({ "_id": req.params.id })
@@ -201,7 +196,7 @@ app.get("/seeNote/:id", function(req, res) {
     }
     // Otherwise, send the doc to the browser as a json object
     else {
-      res.json(data.about);
+      res.json(data);
     }
   });
 });

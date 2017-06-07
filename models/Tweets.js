@@ -25,10 +25,10 @@ var TweetsSchema = new Schema({
   },
 
   // This only saves one note's ObjectId, ref refers to the about model
-  about: {
+  about: [{
     type: Schema.Types.ObjectId,
     ref: "About"
-  }
+  }]
 });
 
 // Create the Tweets model with the TweetssSchema
