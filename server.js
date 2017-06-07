@@ -29,7 +29,15 @@ app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 app.use(express.static("./public"));
 
-mongoose.connect("mongodb://localhost/trumpTweets");
+
+if (process.env.MONGODB_URI){
+  mongoose.connect(process.env.MONGODB_URI)
+}else{
+  mongoose.connect("mongodb://localhost/trumpTweets");
+}
+
+
+
 var db = mongoose.connection;
 
 // DROPS DATABASE
