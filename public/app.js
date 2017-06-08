@@ -66,7 +66,7 @@ $(".seeNote").on("click", function() {
   })
     .done(function(data) {
       console.log(data);
-      $("#notes").append("<h2>" + data.tweetAuthor + "</h2>");
+
 
       var notes = data.about;
       for (var i = 0; i < notes.length; i++){
