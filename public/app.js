@@ -1,18 +1,5 @@
 console.log("jQuery is here")
 
-// tell server to scrape
-$("#scrape").on("click", function() {
-
-  $.ajax({
-    method: "GET",
-    url: "/scrape"
-  })
-
-    .done(function(data) {
-
-      location.reload();
-    });
-});
 
 // saves tweets
 $(".saveTweet").on("click", function() {
