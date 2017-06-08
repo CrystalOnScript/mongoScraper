@@ -1,7 +1,7 @@
 console.log("jQuery is here")
 
 $("#scrape").on("click", function() {
-
+  
   $.ajax({
     method: "GET",
     url: "/scrape"

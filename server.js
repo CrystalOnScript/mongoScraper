@@ -50,7 +50,6 @@ app.get("/", function(req, res) {
     var hbsObject = {
       Tweets: data
     };
-    console.log("this is the hbs object" + hbsObject);
     res.render("index", hbsObject);
   });
 });
@@ -58,10 +57,11 @@ app.get("/", function(req, res) {
 
 app.get("/scrape", function(req, res) {
   db.dropDatabase();
+
   request("https://twitter.com/realDonaldTrump", function(error, response, html) {
 
     var $ = cheerio.load(html);
-
+    var saveTweets = [];
     // loop through each element that is a div with the class of content
     $("div.content").each(function(i, element) {
 
@@ -75,11 +75,16 @@ app.get("/scrape", function(req, res) {
       result.tweetText = $(this).children("div.js-tweet-text-container").children("p.tweet-text").text();
 
 
-      console.log(result);
 
-      var entry = new Tweets(result);
+      saveTweets.push(result);
+    })
 
-      // Now, save that entry to the db
+    var hbsObject = {
+      Tweets: saveTweets
+    };
+    
+    saveTweets.forEach(function(items){
+      var entry = new Tweets(items);
       entry.save(function(err, entry) {
         // Log any errors
         if (err) {
@@ -87,22 +92,17 @@ app.get("/scrape", function(req, res) {
         }
         // Or log the doc
         else {
-          console.log(entry);
+          console.log("success");
           ;
         }
       });
-
     });
-
-    Tweets.find({tweetAuthor: "Donald J. Trump"}).then(function(data) {
-
-      var hbsObject = {
-        Tweets: data
-      };
-      res.json(data);
-    });
+    console.log("this is hbsObject", hbsObject.Tweets[0])
+  res.render("index.handlebars", hbsObject);
   });
 });
+
+
 
 app.post("/savetweet/:id", function(req, res, data) {
 
@@ -236,7 +236,6 @@ app.post("/removenote/:id", function(req, res) {
     if (err) {
       console.log(err);
     }
-    // Otherwise, send the doc to the browser as a json object
     else {
       res.send("deleted");
     }
