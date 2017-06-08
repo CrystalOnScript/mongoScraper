@@ -5,7 +5,7 @@ var mongoose    = require("mongoose");
 var bodyParser  = require("body-parser");
 var logger      = require("morgan");
 
-
+// inport models
 var About       = require("./models/About.js");
 var Tweets      = require("./models/Tweets.js");
 
@@ -24,12 +24,12 @@ app.use(logger("dev"));
 app.use(bodyParser.urlencoded({
   extended: false
 }));
-
+// express handlebars
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 app.use(express.static("./public"));
 
-
+// database connection
 if (process.env.MONGODB_URI){
   mongoose.connect(process.env.MONGODB_URI)
 }else{
@@ -40,9 +40,7 @@ if (process.env.MONGODB_URI){
 
 var db = mongoose.connection;
 
-// DROPS DATABASE
-// db.dropDatabase();
-
+// routes to home, check DB for tweets
 app.get("/", function(req, res) {
 
   Tweets.find({tweetAuthor: "Donald J. Trump"}).then(function(data) {
@@ -54,7 +52,7 @@ app.get("/", function(req, res) {
   });
 });
 
-
+// scrapes twitter for data
 app.get("/scrape", function(req, res) {
   db.dropDatabase();
 
@@ -74,23 +72,18 @@ app.get("/scrape", function(req, res) {
       // finds the text of the tweet
       result.tweetText = $(this).children("div.js-tweet-text-container").children("p.tweet-text").text();
 
-
-
       saveTweets.push(result);
     })
-
     var hbsObject = {
       Tweets: saveTweets
     };
-    
+
     saveTweets.forEach(function(items){
       var entry = new Tweets(items);
       entry.save(function(err, entry) {
-        // Log any errors
         if (err) {
           console.log(err);
         }
-        // Or log the doc
         else {
           console.log("success");
           ;
@@ -103,45 +96,34 @@ app.get("/scrape", function(req, res) {
 });
 
 
-
+// saves a tweet so you can comment
 app.post("/savetweet/:id", function(req, res, data) {
-
   console.log(data)
   var query = {"_id": req.params.id};
   var update = {"saved": true};
   var options = {new: true};
-      // Use the article id to find and update it's note
       Tweets.findOneAndUpdate(query, update, options, function(err, doc) {
-        // Log any errors
         if (err) {
           console.log(err);
         }
         else {
-          // Or send the document to the browser
           res.send(doc);
-
         }
       });
-
   console.log("saved tweet")
-
 });
 
+// unsaves tweet
 app.post("/removetweet/:id", function(req, res, data) {
-
   var query = {"_id": req.params.id};
   var update = {"saved": false};
   var options = {new: true};
-      // Use the article id to find and update it's saved status
       Tweets.findOneAndUpdate(query, update, options).then(function(err, doc) {
-        // Log any errors
         if (err) {
           console.log(err);
         }
         else {
-          // Or send the document to the browser
           res.json({ success: true});
-
         }
       });
 
@@ -149,11 +131,9 @@ app.post("/removetweet/:id", function(req, res, data) {
 
 });
 
-
+// views all the saved tweets
 app.get("/viewTweets", function(req, res) {
-
     Tweets.find({tweetAuthor: "Donald J. Trump"}).then(function(data) {
-
       var hbsObject = {
         Tweets: data
       };
@@ -162,20 +142,14 @@ app.get("/viewTweets", function(req, res) {
     });
 });
 
+// creates box to make note
 app.get("/makeNote/:id", function(req, res) {
-
-  console.log("this is req id \n\n"+ req.params.id);
-      // Use the article id to find and update it's note
       Tweets.findOne({ "_id": req.params.id })
-      // ..and populate all of the notes associated with it
       .populate("note")
-      // now, execute our query
       .exec(function(error, doc) {
-        // Log any errors
         if (error) {
           console.log(error);
         }
-        // Otherwise, send the doc to the browser as a json object
         else {
           res.json(doc);
         }
@@ -183,28 +157,21 @@ app.get("/makeNote/:id", function(req, res) {
       console.log("created note")
 });
 
+ // saves created note
 app.post("/savenote/:id", function(req, res) {
-
   var newNote = new About(req.body);
   console.log("this is newNote", newNote)
-  // And save the new note the db
   newNote.save(function(error, doc) {
-    // Log any errors
     if (error) {
       console.log(error);
     }
-    // Otherwise
     else {
-      // Use the article id to find and update it's note
       Tweets.findOneAndUpdate({ "_id": req.params.id }, {$push: {"about": newNote }})
-      // Execute the above query
       .exec(function(err, doc) {
-        // Log any errors
         if (err) {
           console.log(err);
         }
         else {
-          // Or send the document to the browser
           res.send(doc);
         }
       });
@@ -212,26 +179,22 @@ app.post("/savenote/:id", function(req, res) {
   });
 });
 
+// show saved notes
 app.get("/seenote/:id", function(req, res) {
-
-  // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
   Tweets.findOne({ "_id": req.params.id })
   .populate("about").exec(function(error, data) {
-
     console.log("THIS IS DOC \n" +data)
-    // Log any errors
     if (error) {
       console.log(error);
     }
-    // Otherwise, send the doc to the browser as a json object
     else {
       res.json(data);
     }
   });
 });
 
+// deletes a note
 app.post("/removenote/:id", function(req, res) {
-
   About.remove({ _id: req.params.id }, function(err) {
     if (err) {
       console.log(err);
@@ -240,7 +203,6 @@ app.post("/removenote/:id", function(req, res) {
       res.send("deleted");
     }
   });
-
 });
 
 // listens to port
